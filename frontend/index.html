@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DeepGuard Liveness</title>
+    <script src="https://unpkg.com/@aws-amplify/ui-components/dist/aws-amplify-ui-components.js"></script>
+    <style>
+        #liveness-container { width: 600px; height: 600px; margin: 20px auto; }
+        body { text-align: center; font-family: Arial; padding: 20px; }
+        .auth-section { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="auth-section">
+        <button id="signOut" style="display:none;">Logout</button>
+        <p id="userEmail"></p>
+    </div>
+    <h1>Face Liveness Verification</h1>
+    <div id="liveness-container"></div>
+    
+    <script type="module" src="/static/liveness.js"></script>
+</body>
+</html>
