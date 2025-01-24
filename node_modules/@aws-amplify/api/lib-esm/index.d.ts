@@ -1,0 +1,6 @@
+import { API } from './API';
+export { GraphQLQuery, GraphQLSubscription } from './types';
+export { API, APIClass } from './API';
+export { graphqlOperation, GraphQLAuthError, GRAPHQL_AUTH_MODE, } from '@aws-amplify/api-graphql';
+export type { GraphQLResult } from '@aws-amplify/api-graphql';
+export default API;

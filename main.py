@@ -1,7 +1,6 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Body
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import JSONResponse
 import torch
 import cv2
 import numpy as np
@@ -13,13 +12,10 @@ from dotenv import load_dotenv
 from aws_utils import AWSServices
 from liveness_utils import AWSLivenessDetector
 
-# Load environment variables
 load_dotenv()
+app = FastAPI(title="DeepGuard", version="4.0")
 
-# Initialize FastAPI
-app = FastAPI(title="DeepGuard", version="3.0")
-
-# Configure CORS
+# Middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -27,18 +23,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve static files for frontend
-app.mount("/static", StaticFiles(directory="frontend"), name="static")
-
-# Initialize AWS services
+# Services
 aws = AWSServices()
 liveness_detector = AWSLivenessDetector()
 
-# Load deepfake model
+# Model Loading
 def load_model():
     try:
         model = EfficientNet.from_pretrained('efficientnet-b0', num_classes=1)
-        checkpoint = torch.load('efficientNetFFPP.pth', map_location='cpu')
+        checkpoint = torch.load('/home/vortex/api-deepfake/efficientNetFFPP.pth', map_location='cpu', weights_only=True)
         
         if 'state_dict' in checkpoint:
             model.load_state_dict(checkpoint['state_dict'], strict=False)
@@ -51,7 +44,7 @@ def load_model():
         return model
     except Exception as e:
         logging.error(f"Model loading error: {str(e)}")
-        raise
+        return None
 
 try:
     deepfake_model = load_model()
@@ -59,22 +52,7 @@ except Exception as e:
     logging.error(f"Failed to initialize model: {e}")
     deepfake_model = None
 
-# Frontend routes
-@app.get("/", response_class=HTMLResponse)
-async def serve_frontend():
-    with open("frontend/index.html") as f:
-        return HTMLResponse(content=f.read())
-
-# Liveness detection endpoints
-@app.post("/api/create-session")
-async def create_session():
-    return liveness_detector.create_session()
-
-@app.post("/api/verify-session")
-async def verify_session(session_id: str = Body(..., embed=True)):
-    return await liveness_detector.verify_session(session_id)
-
-# Existing deepfake detection endpoint
+# API Endpoints
 @app.post("/detect")
 async def detect(
     video: UploadFile = File(...),
@@ -82,37 +60,29 @@ async def detect(
 ):
     try:
         video_path = await save_file(video)
-        results = {}
-
-        # Deepfake analysis
-        if deepfake_model is not None:
-            results['deepfake'] = await analyze_video(video_path)
-        else:
-            results['deepfake_error'] = "Deepfake model not available"
-
-        # Voice analysis
-        audio_path = None
-        if audio is not None:
-            audio_path = await save_file(audio)
-            voice_result = aws.detect_voice_fraud(audio_path)
-            results['voice'] = voice_result
-
+        audio_path = await save_file(audio) if audio else None
+        
+        results = {
+            'deepfake': await analyze_video(video_path) if deepfake_model else {'error': 'Model unavailable'},
+            'voice': aws.detect_voice_fraud(audio_path) if audio else None
+        }
+        
         # Cleanup
         if os.path.exists(video_path):
             os.remove(video_path)
         if audio_path and os.path.exists(audio_path):
             os.remove(audio_path)
-
+            
         return results
-
+        
     except Exception as e:
-        logging.error(f"API error: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logging.error(f"Detection failed: {str(e)}")
+        raise HTTPException(500, detail=str(e))
 
-# Helper functions
+# Helper Functions
 async def analyze_video(path: str) -> dict:
-    if deepfake_model is None:
-        return {'error': 'Model not initialized'}
+    if not deepfake_model:
+        return {'error': 'Model unavailable'}
     
     device = next(deepfake_model.parameters()).device
     cap = cv2.VideoCapture(path)
@@ -155,7 +125,7 @@ async def save_file(file: UploadFile) -> str:
         logging.error(f"File save error: {str(e)}")
         raise HTTPException(status_code=500, detail="File processing failed")
 
-# Health check endpoint
+# Health Check
 @app.get("/health")
 async def health_check():
     return {
@@ -164,7 +134,6 @@ async def health_check():
         "aws_configured": all(key in os.environ for key in ['AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY'])
     }
 
-# Server startup
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

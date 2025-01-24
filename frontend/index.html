@@ -1,12 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>DeepGuard Liveness</title>
+    <title>DeepGuard Liveness Verification</title>
     <script src="https://unpkg.com/@aws-amplify/ui-components/dist/aws-amplify-ui-components.js"></script>
     <style>
-        #liveness-container { width: 600px; height: 600px; margin: 20px auto; }
-        body { text-align: center; font-family: Arial; padding: 20px; }
-        .auth-section { margin-bottom: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f5;
+            text-align: center;
+        }
+        #liveness-container {
+            width: 600px;
+            height: 600px;
+            margin: 20px auto;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            background: #fff;
+        }
+        .auth-section {
+            margin-bottom: 20px;
+        }
+        #signOut {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #result-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -14,8 +42,9 @@
         <button id="signOut" style="display:none;">Logout</button>
         <p id="userEmail"></p>
     </div>
-    <h1>Face Liveness Verification</h1>
+    <h1>🔒 DeepGuard Face Verification</h1>
     <div id="liveness-container"></div>
+    <p id="result-text">Initializing...</p>
     
     <script type="module" src="/static/liveness.js"></script>
 </body>
