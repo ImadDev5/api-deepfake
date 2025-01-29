@@ -1,5 +1,7 @@
 # constants.py
 
+# constants.py
+
 PHISHING_KEYWORDS = [
     # English
     "OTP", "KYC", "block", "suspend", "password", "account",
@@ -14,7 +16,18 @@ PHISHING_KEYWORDS = [
     "breach", "compromise", "security alert", "security update",
     "security notification", "security warning", "security message",
     "security advisory", "security notice",
-    
+    # Common Indian English Pronunciation Mistakes
+    "akount", "pashwurd", "otpee", "kyc updait", "baank", "sekyurity",
+    "aadhaar kard", "lotrii", "kongraachulashuns", "klaaim", "limiited taim",
+    "ofr", "klik heer", "updaite", "konfirm", "lugin", "aleert", "deer kastomer",
+    "refand", "invoyce", "tranzakshun", "unautharized", "imeediate akshun",
+    "akt fast", "kaandly", "rikwest", "asistans", "helpp", "attenshun",
+    "impawtant", "nootis", "paymant", "doo", "ovadue", "akses", "sekure",
+    "unyoozhal aktiviti", "suspiishus", "lok", "anlok", "reeaktivate",
+    "valideit", "kredenshuls", "perzanal informashun", "identiti",
+    "breech", "kampramise", "sekyurity aleert", "sekyurity updaite",
+    "sekyurity notifikashun", "sekyurity warining", "sekyurity mesij",
+    "sekyurity advisari", "sekyurity nootis",
     # Hindi
     "ओटीपी", "केवाईसी", "ब्लॉक", "निलंबित", "पासवर्ड", "खाता",
     "सत्यापित", "तत्काल", "विजेता", "बैंक", "सुरक्षा", "आधार",
@@ -27,7 +40,6 @@ PHISHING_KEYWORDS = [
     "मान्य करें", "क्रेडेंशियल्स", "व्यक्तिगत जानकारी", "पहचान",
     "उल्लंघन", "समझौता", "सुरक्षा चेतावनी", "सुरक्षा अपडेट",
     "सुरक्षा अधिसूचना", "सुरक्षा संदेश", "सुरक्षा सलाह", "सुरक्षा सूचना",
-    
     # Hinglish
     "account band", "ATM card", "kyc update", "pan card",
     "password reset", "bank account", "kaun se bank ka account hai jisme paisa lena chahte ho",
@@ -53,3 +65,15 @@ FRAUD_PATTERNS = {
         "kyc update karna hai"
     ]
 }
+# Liveness Detection Thresholds
+LIVENESS_THRESHOLD = 70  # Minimum confidence for liveness
+
+# Lip Sync Analysis
+LIP_SYNC_THRESHOLD = 0.80  # Minimum score for valid lip sync
+
+# Fraud Risk Scoring
+RISK_SCORE_THRESHOLD = 0.7  # Minimum risk score to flag fraud
+
+# File Paths for Local Use (fallbacks)
+TEMP_DIR = "/tmp"
+FEEDBACK_DIR = "/tmp/feedback"

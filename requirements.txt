@@ -1,0 +1,12 @@
+fastapi==0.95.2
+uvicorn==0.23.2
+boto3==1.28.57
+pydantic==2.4.2
+pydantic-settings==2.0.3
+torch==2.0.1
+efficientnet-pytorch==0.7.1
+opencv-python==4.8.1.78
+Pillow==10.0.1
+numpy==1.23.5
+requests==2.31.0
+python-dotenv==1.0.0

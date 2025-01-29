@@ -1,51 +1,78 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DeepGuard Liveness Verification</title>
-    <script src="https://unpkg.com/@aws-amplify/ui-components/dist/aws-amplify-ui-components.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background: #f5f5f5;
-            text-align: center;
+            margin: 20px;
         }
         #liveness-container {
-            width: 600px;
-            height: 600px;
-            margin: 20px auto;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            background: #fff;
-        }
-        .auth-section {
+            width: 640px;
+            height: 480px;
+            border: 2px solid #ccc;
             margin-bottom: 20px;
-        }
-        #signOut {
-            background: #ff4444;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
         }
         #result-text {
             font-size: 18px;
-            font-weight: bold;
+            margin-top: 10px;
+        }
+        #feedback-form {
             margin-top: 20px;
+        }
+        #feedback-form input, #feedback-form textarea {
+            display: block;
+            margin: 10px 0;
+            padding: 8px;
+            width: 100%;
+            max-width: 400px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #ff4444;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
         }
     </style>
 </head>
 <body>
-    <div class="auth-section">
-        <button id="signOut" style="display:none;">Logout</button>
-        <p id="userEmail"></p>
-    </div>
     <h1>🔒 DeepGuard Face Verification</h1>
-    <div id="liveness-container"></div>
-    <p id="result-text">Initializing...</p>
-    
-    <script type="module" src="/static/liveness.js"></script>
+    <div id="liveness-container">Initializing...</div>
+    <div id="result-text">Result: Waiting...</div>
+
+    <!-- Feedback Form -->
+    <div id="feedback-form">
+        <h3>Report Suspicious Transactions</h3>
+        <form id="report-form">
+            <label for="user_id">User ID:</label>
+            <input type="text" id="user_id" name="user_id" required>
+            
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+            
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <!-- Include AWS Amplify SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/aws-amplify@latest/dist/aws-amplify.min.js"></script>
+    <!-- Include Custom JS -->
+    <script src="liveness.js"></script>
 </body>
 </html>

@@ -8,17 +8,19 @@ import uuid
 from PIL import Image
 import cv2
 
+# Configure logger
 logger = logging.getLogger('AWS-Liveness')
 
 class AWSLivenessDetector:
     def __init__(self):
         try:
+            # Initialize AWS clients
             self.region = settings.aws_region
             self.rekognition = boto3.client(
                 'rekognition',
                 aws_access_key_id=settings.aws_access_key_id,
                 aws_secret_access_key=settings.aws_secret_access_key,
-                region_name=settings.aws_region,
+                region_name=self.region,
                 config=Config(
                     signature_version='s3v4',
                     retries={'max_attempts': settings.max_retries},
@@ -29,7 +31,7 @@ class AWSLivenessDetector:
                 's3',
                 aws_access_key_id=settings.aws_access_key_id,
                 aws_secret_access_key=settings.aws_secret_access_key,
-                region_name=settings.aws_region,
+                region_name=self.region,
                 config=Config(
                     signature_version='s3v4',
                     retries={'max_attempts': settings.max_retries},
@@ -43,6 +45,11 @@ class AWSLivenessDetector:
             raise
 
     def create_session(self) -> dict:
+        """
+        Create a new face liveness session.
+        Returns:
+            dict: Session details including session ID and region.
+        """
         try:
             response = self.rekognition.create_face_liveness_session()
             return {
@@ -54,6 +61,13 @@ class AWSLivenessDetector:
             return {'error': e.response['Error']['Message']}
 
     def get_session_results(self, session_id: str) -> dict:
+        """
+        Retrieve results of a face liveness session.
+        Args:
+            session_id (str): The session ID returned during session creation.
+        Returns:
+            dict: Liveness results including confidence score and status.
+        """
         try:
             response = self.rekognition.get_face_liveness_session_results(
                 SessionId=session_id
@@ -68,18 +82,29 @@ class AWSLivenessDetector:
             return {'error': e.response['Error']['Message']}
 
     def upload_to_s3(self, file_path: str, s3_key: str) -> str:
+        """
+        Upload a file to S3.
+        Args:
+            file_path (str): Local path of the file to upload.
+            s3_key (str): Key (path) in the S3 bucket where the file will be stored.
+        Returns:
+            str: S3 URI of the uploaded file.
+        """
         try:
-            self.s3.upload_file(
-                file_path,
-                self.bucket_name,
-                s3_key
-            )
+            self.s3.upload_file(file_path, self.bucket_name, s3_key)
             return f"s3://{self.bucket_name}/{s3_key}"
         except Exception as e:
             logger.error(f"S3 upload failed: {str(e)}")
             raise
 
     def _convert_to_jpeg(self, file_path: str) -> str:
+        """
+        Convert an image file to JPEG format if it's not already in JPEG.
+        Args:
+            file_path (str): Path to the input image file.
+        Returns:
+            str: Path to the converted JPEG file.
+        """
         try:
             if file_path.lower().endswith(('.jpg', '.jpeg')):
                 return file_path
@@ -92,6 +117,13 @@ class AWSLivenessDetector:
             raise ValueError("Unsupported image format") from e
 
     def _extract_frame_from_video(self, video_path: str) -> str:
+        """
+        Extract the first frame from a video file.
+        Args:
+            video_path (str): Path to the input video file.
+        Returns:
+            str: Path to the extracted frame image file.
+        """
         try:
             cap = cv2.VideoCapture(video_path)
             ret, frame = cap.read()
@@ -106,12 +138,20 @@ class AWSLivenessDetector:
             raise ValueError("Unsupported video format") from e
 
     def full_vkyc_check(self, session_id: str, id_card_path: str, video_path: str) -> dict:
+        """
+        Perform a full Video KYC check, including liveness detection and face matching.
+        Args:
+            session_id (str): The session ID for liveness detection.
+            id_card_path (str): Path to the ID card image file.
+            video_path (str): Path to the video file for liveness detection.
+        Returns:
+            dict: Results of the VKYC check, including liveness and face match details.
+        """
         temp_files = []  # Track temporary files for cleanup
         try:
             # Convert ID card to JPEG if needed
             id_card_path = self._convert_to_jpeg(id_card_path)
-            if id_card_path not in [id_card_path]:
-                temp_files.append(id_card_path)
+            temp_files.append(id_card_path)
 
             # Extract frame from video
             video_frame_path = self._extract_frame_from_video(video_path)
@@ -152,13 +192,10 @@ class AWSLivenessDetector:
                 },
                 'session_id': session_id
             }
-
             return result
-
         except Exception as e:
             logger.error(f"VKYC check failed: {str(e)}")
             raise
-
         finally:
             # Cleanup temporary files
             for temp_file in temp_files:
