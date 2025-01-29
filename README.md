@@ -133,6 +133,74 @@ deepguard/
 └── README.md               # Project documentation
 
 
+
+Example Responses
+Below are example requests and responses for each API endpoint.
+
+1. Deepfake and Voice Fraud Detection (/detect)
+Detects deepfakes in videos and voice fraud in audio recordings.
+
+curl -X POST http://localhost:8000/detect \
+-F "video=@test.mp4" \
+-F "audio=@test.wav"
+
+{
+  "deepfake": {
+    "risk_score": 0.85,
+    "frames_analyzed": 120
+  },
+  "voice": {
+    "risk_score": 0.9,
+    "is_fraud": true,
+    "transcript": "Please share your OTP immediately to claim your lottery prize.",
+    "sentiment": "NEGATIVE",
+    "flagged_keywords": ["OTP", "lottery", "claim"]
+  }
+}
+
+Request:
+curl -X POST http://localhost:8000/detect \
+-F "video=@test.mp4" \
+-F "audio=@test.wav"
+
+Response:
+{
+  "deepfake": {
+    "risk_score": 0.85,
+    "frames_analyzed": 120
+  },
+  "voice": {
+    "risk_score": 0.9,
+    "is_fraud": true,
+    "transcript": "Please share your OTP immediately to claim your lottery prize.",
+    "sentiment": "NEGATIVE",
+    "flagged_keywords": ["OTP", "lottery", "claim"]
+  }
+}
+
+2. Video KYC Verification (/vkyc)
+Performs face matching and liveness checks for Video KYC.
+
+Request:
+curl -X POST http://localhost:8000/vkyc \
+-F "video=@test.mp4" \
+-F "id_card=@id_card.jpeg"
+
+Response:
+{
+  "liveness": {
+    "confidence": 95.7,
+    "status": "SUCCEEDED",
+    "session_id": "abc123-def456"
+  },
+  "face_match": {
+    "similarity": 92.3,
+    "matched": true
+  },
+  "session_id": "abc123-def456"
+}
+Note; Repeat similar sections for /analyze-transaction, /detect-jamtara, and /health.
+
 Contact
 For questions or feedback, please contact:
 
