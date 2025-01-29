@@ -1,161 +1,141 @@
-# DeepGuard: Deepfake Detection API 🔍
+# DeepGuard 2.0: Advanced Fraud Detection System
 
-**Team Md Imaduddin** - Backend & AI/ML, AWS Integration & Deployment  
-**Kazi Israr Mohammed** - Frontend & UI  
-
-A REST API to detect deepfake risks in video/audio inputs using AI/ML models, integrated with a responsive frontend and deployed on AWS.
+DeepGuard 2.0 is a cutting-edge fraud detection system that leverages AWS services, deepfake detection models, and transaction monitoring to identify and prevent fraudulent activities. It includes features such as liveness checks, video KYC verification, deepfake detection, and voice fraud analysis.
 
 ---
 
-## Features ✨
-- **Multimodal Analysis**: Detect anomalies in video (lip-sync, facial artifacts) and audio (voice cloning, synthetic speech).
-- **Risk Scoring**: Combined risk score for deepfake likelihood (0-1 scale).
-- **Keyword Flagging**: Identify suspicious keywords in transcripts (e.g., "account", "winner").
-- **Sentiment Analysis**: Categorize audio sentiment (`NEUTRAL`, `POSITIVE`, `NEGATIVE`).
-- **AWS Deployment**: Scalable cloud infrastructure with load balancing.
+## Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Setup Instructions](#setup-instructions)
+- [API Endpoints](#api-endpoints)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [License](#license)
 
 ---
 
-## Tech Stack 🛠️
-| Component       | Tools                                                                 |
-|-----------------|-----------------------------------------------------------------------|
-| **Backend**     | FastAPI, OpenCV, Librosa, TensorFlow/PyTorch                          |
-| **Frontend**    | React.js, Material-UI, Chart.js                                       |
-| **AWS Services**| EC2, S3 (File Storage), CloudWatch (Logging), API Gateway             |
-| **DevOps**      | Docker, GitHub Actions (CI/CD), NGINX (Reverse Proxy)                 |
+## Overview
+
+DeepGuard 2.0 is designed to combat modern fraud techniques, including deepfakes, voice phishing (vishing), and Jamtara-style scams. The system integrates AWS Fraud Detector, Rekognition, Transcribe, and Comprehend to provide real-time risk analysis and fraud detection.
 
 ---
 
-## Setup 🚀
+## Features
+
+- **Liveness Check**: Ensures the user is physically present during transactions using AWS Rekognition.
+- **Video KYC Verification**: Matches the user's face in a video with their ID card image.
+- **Deepfake Detection**: Analyzes videos to detect deepfake content using a pre-trained EfficientNet model.
+- **Voice Fraud Analysis**: Detects phishing keywords, sentiment, and suspicious patterns in audio recordings.
+- **Transaction Monitoring**: Analyzes individual transactions and detects suspicious patterns like rapid small transactions or multiple locations.
+- **Feedback Submission**: Allows users to report suspicious transactions for further analysis.
+
+---
+
+## Technologies Used
+
+- **Backend Framework**: FastAPI
+- **Machine Learning Models**:
+  - EfficientNet-B4 (Deepfake Detection)
+  - AWS Rekognition (Face Matching, Liveness Check)
+  - AWS Transcribe (Audio Transcription)
+  - AWS Comprehend (Sentiment Analysis)
+- **Cloud Services**:
+  - AWS S3 (File Storage)
+  - AWS Fraud Detector (Transaction Risk Analysis)
+- **Frontend**: HTML + JavaScript (AWS Amplify Integration)
+- **Dependencies**: PyTorch, Boto3, Pydantic, OpenCV, Pillow
+
+---
+
+## Setup Instructions
 
 ### Prerequisites
-- Python 3.9+, Node.js 16+
-- AWS CLI (for deployment)
-- FFmpeg (for video processing)
+
+1. **Python 3.8+**: Ensure Python is installed on your system.
+2. **AWS Account**: Create an AWS account and configure IAM roles with permissions for:
+   - Rekognition
+   - S3
+   - Transcribe
+   - Comprehend
+   - Fraud Detector
+3. **Deepfake Model**: Download the pre-trained EfficientNet model (`efficientNetFFPP.pth`) and place it in the project root directory.
 
 ### Installation
-1. **Clone the repository**:
+
+1. Clone the repository:
    ```bash
-   git clone https://github.com/your-org/deepguard.git
-   cd deepguard
-Backend Setup:
+   https://github.com/ImadDev5/api-deepfake.git
+   cd api-deepfake
 
-bash
-Copy
-cd api-deepfake
-python -m venv myenv
-source myenv/bin/activate
-pip install -r requirements.txt  # Include FastAPI, numpy, torch, etc.
-Frontend Setup:
+2. Create a virtual environment:
+   python3 -m venv myenv
+   source myenv/bin/activate
 
-bash
-Copy
-cd ../frontend
-npm install
-Run Locally:
+3. Install dependencies:
+   pip install -r requirements.txt
 
-Backend:
+4. Configure environment variables:
+Rename .env.example to .env and update the following:
+   AWS_ACCESS_KEY_ID=your-access-key-id
+AWS_SECRET_ACCESS_KEY=your-secret-access-key
+AWS_REGION=ap-south-1
+AWS_S3_BUCKET=your-s3-bucket-name
+COGNITO_CLIENT_ID=your-cognito-client-id
+COGNITO_USER_POOL_ID=your-user-pool-id
+COGNITO_IDENTITY_POOL_ID=your-identity-pool-id
 
-bash
-Copy
-uvicorn main:app --reload --port 8000
-Frontend:
 
-bash
-Copy
-npm start
-API Documentation 📄
-POST /detect
-Analyze video/audio files for deepfake indicators.
 
-Example Request:
+5. Start the server:
+  uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-bash
-Copy
-curl -X POST http://localhost:8000/detect \
-  -F "video=@interview.mp4" \
-  -F "audio=@interview.wav"
-Example Response:
-~/api-deepfake$ curl -X 'POST'   'http://127.0.0.1:8000/vkyc'   -H 'accept: applicationcurl -X POST http://localhost:8000/detect -F "audio=@test.wav"
-{"risk_score":0.8,"transcript":"जी सिर व्हाट्सएप में भेज दिए है आपके । हेलो हाँ सिर व्हाट्सएप में भेज दिए है आपके जी आपका मैसेज मैंने चेक किया है बिलकुल राइट है कांगेेशंस डियर कस्टमर जी सिर थैंक यू सिर प्राइस ओएफ ट्वेंटी फाइव केबीसी व्हाट्सएप एंड इम आपको और आपकी फैमिली को बधाई कहता हूँ जी सिर थैंक यू सिर फाइव लाख लॉटरी जीता है अल्ल इंडिया सिम लकी ड्रॉ ऑफर करवाया गया है आईपीएल फाइनल विन की खुशी में पांच हज़ार नंबरों का कॉम्पिटिशन हुआ है । एक सौ छब्बीस नंबर चुने थे जिसमें आपका नंबर भाग्यशाली है, आपका नंबर पच्चीस लाख का विनर बनाइये पैसा बैंक अकाउंट में मिलेगा । कौन से बैंक का अकाउंट है जिसमे पैसा लेना चाहते हो बेटा? जी सिर इंडियन बैंक है । लॉटरी के बारे में चर्चा बाजी शोर शराब नहीं करना है सधान होकर काम करवाना है, भगवान ने आपको बहुत बड़ा चांस दिया है केपीसी के विनर बने है अभी आप ऐसे करे बेटा अकाउंट नंबर कॉपी का फोटो, आधार कार्ड का फोटो ये मुझे आप व्हाट्सएप पर भेजे भेज कर कॉल करे, कितना टाइम लगेगा भेजने में जी सिर जितना आपकी माँ चोधने में लगेगा । हाँ माँ आपकी माँ । हाँ ।","sentiment":"NEUTRAL","flagged_keywords":["बैंक","आधार","लॉटरी","बधाई"],"audio_uri":"s3://deepguard-videos/audio/1f92c595-0068-43f9-b98d-b9a2165e9cd8/tmpts05wu60.wav"}
 
-json
-Copy
-{
-  "deepfake": {
-    "risk_score": 0.72,
-    "frames_analyzed": 120,
-    "flagged_artifacts": ["lip_sync_mismatch", "unnatural_eye_blink"]
-  },
-  "voice": {
-    "risk_score": 0.18,
-    "is_fraud": false,
-    "transcript": "Please share your bank account details...",
-    "sentiment": "NEGATIVE",
-    "flagged_keywords": ["bank account"]
-  }
-}
-Edge Cases:
+Open the frontend in your browser:
+Navigate to frontend/index.html.
 
-Video-only analysis:
 
-bash
-Copy
-curl -X POST http://localhost:8000/detect -F "video=@test.mp4"
-Audio-only analysis:
+API Endpoints
+/health
+GET
+Health check endpoint.
+/detect
+POST
+Detect deepfakes and voice fraud.
+/vkyc
+POST
+Perform Video KYC verification.
+/analyze-transaction
+POST
+Analyze individual transactions for fraud.
+/detect-jamtara
+POST
+Detect Jamtara-style scam patterns.
 
-bash
-Copy
-curl -X POST http://localhost:8000/detect -F "audio=@test.wav"
-Project Status 📌
-Current (Q3 2023)
-✅ Completed
+Project Structure
+deepguard/
+├── frontend/               # Frontend files (HTML, JS)
+│   ├── index.html          # Main frontend page
+│   └── liveness.js         # Liveness check integration
+├── efficientNetFFPP.pth    # Pre-trained deepfake detection model
+├── main.py                 # FastAPI backend entry point
+├── aws_liveness.py         # AWS Liveness Detector utility
+├── aws_utils.py            # AWS service integrations
+├── config.py               # Configuration settings
+├── constants.py            # Constants for phishing keywords and fraud patterns
+├── feedback.py             # Feedback submission service
+├── liveness_utils.py       # Liveness check utilities
+├── transaction_monitor.py  # Transaction monitoring logic
+├── .env                    # Environment variables
+├── requirements.txt        # Python dependencies
+└── README.md               # Project documentation
 
-Core deepfake detection model (ResNet-50 + LSTM hybrid).
 
-Basic React frontend dashboard.
+Contact
+For questions or feedback, please contact:
 
-AWS EC2 deployment pipeline.
+Email : imaduddin.dev@gmail.com
+GitHub : @ImadDev5
 
-🚧 In Progress
-
-Real-time video streaming analysis.
-
-User authentication (JWT integration).
-
-Future Goals 🎯
-Mobile Integration: Flutter app for on-device analysis.
-
-Blockchain Audit Trails: Store verified media hashes on Ethereum.
-
-Globalization: Support for 10+ languages (Hindi, Mandarin, Arabic).
-
-Enterprise Tier: Slack/MS Teams bot for corporate phishing prevention.
-
-Architecture Overview 🏗️
-plaintext
-Copy
-User → React Frontend → AWS API Gateway → FastAPI (EC2) → AI Models → S3 Storage
-                               ↑
-                          CloudWatch (Logs)
-Contributing 🤝
-Fork the repository.
-
-Create a feature branch: git checkout -b feature/your-idea.
-
-Submit a PR with tests and documentation.
-
-Follow the Code of Conduct.
-
-License 📜
-MIT License. See LICENSE.
-
-Acknowledgments 🌟
-OpenAI Whisper (transcription baseline).
-
-AWS AI/ML Scholarships for computational resources.
-AWS for providing cloud services.
-
-PyTorch community for pre-trained models.
-
-FastAPI for building a high-performance backend.
